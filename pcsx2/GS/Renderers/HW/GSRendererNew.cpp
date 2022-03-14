@@ -558,6 +558,9 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 	// Optimize blending equations, must be done before index calculation
 	if ((m_conf.ps.blend_a == m_conf.ps.blend_b) || ((m_conf.ps.blend_b == m_conf.ps.blend_d) && (alpha_c0_one || alpha_c2_one)))
 	{
+		if ((m_conf.ps.blend_a != m_conf.ps.blend_b) && (m_conf.ps.blend_a == 1 || m_conf.ps.blend_b == 1 || m_conf.ps.blend_d == 1))
+			fprintf(stderr, "Optimization, alpha is 1.0\n");
+
 		// Condition 1:
 		// A == B
 		// (A - B) * C, result will be 0.0f so set A B to Cs, C to As
@@ -574,6 +577,9 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 	}
 	else if (alpha_c0_zero || alpha_c2_zero)
 	{
+		if (m_conf.ps.blend_a == 1 || m_conf.ps.blend_b == 1)
+			fprintf(stderr, "Optimization, alpha is zero\n");
+
 		// C == 0.0f
 		// (A - B) * C, result will be 0.0f so set A B to Cs
 		m_conf.ps.blend_a = 0;
